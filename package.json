@@ -1,0 +1,13 @@
+{
+  "name": "eat-well-tomorrow",
+  "version": "1.0.0",
+  "description": "Eat well today and eat well tomorrow.",
+  "scripts": {},
+  "keywords": [],
+  "author": "Trick",
+  "license": "",
+  "dependencies": {},
+  "devDependencies": {
+    "miniprogram-api-typings": "^2.8.3-1"
+  }
+}
