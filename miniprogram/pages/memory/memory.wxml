@@ -1,0 +1,211 @@
+<!-- 防止弹窗穿透 -->
+<page-meta page-style="overflow: {{isShowPopup ? 'hidden' : 'visible'}}" />
+<!-- 回忆页面总样式 -->
+<view class="view-memory-page">
+  <!-- 顶部信息栏 -->
+  <view class="view-top-box">
+    <!-- 公告栏 -->
+    <view class="view-centerY-box">
+      <!-- 公告图标 -->
+      <image class="image-basics-icon" src="../../images/img_notice_icon.png" style="width: 35rpx;height: 32rpx;"></image>
+      <!-- 公告内容 -->
+      <text class="text-whiteThirty-content" style="margin-left: 20rpx;">{{notice}}</text>
+    </view>
+    <!-- 回忆总数栏 -->
+    <view class="view-centerY-box" style="margin-top: 30rpx;margin-bottom: 100rpx;">
+      <view class="text-whiteThirty-content">全部回忆 ({{memorySum}})</view>
+    </view>
+  </view>
+  <!-- 有回忆存在时 -->
+  <block wx:if="{{memorySum > 0}}">
+    <!-- 遍历回忆列表 -->
+    <block wx:for="{{memoryList}}" wx:key="id">
+      <!-- 单个回忆栏 -->
+      <view class="view-memoryCell-box" style="margin-top: {{index === 0 ? '-70rpx' : '20rpx'}};" data-data="{{item}}" bindtap="onClickMemoryCell">
+        <!-- 单个回忆的标题栏 -->
+        <text class="general-memoryCell-mostOneLine" style="color: #000000;font-size: 30rpx;font-weight: bold;margin: 20rpx 130rpx 0 30rpx;">{{item.title}}</text>
+        <!-- 单个回忆的内容栏 -->
+        <text class="general-memoryCell-mostOneLine" style="color: #434646;font-size: 24rpx;margin: 5rpx 130rpx 0rpx 30rpx;">{{item.content}}</text>
+        <!-- 单个回忆存在云图片列表时 -->
+        <block wx:if="{{item.cloudPicPathList.length > 0}}">
+          <!-- 单个回忆的图片列表 -->
+          <view class="general-memoryCell-mostOneLine" style="margin: 5rpx 130rpx 0rpx 30rpx;">
+            <!-- 遍历本地图片列表 -->
+            <block wx:for="{{item.localPicPathList}}" wx:key="*this">
+              <!-- 单个回忆的图片单元 -->
+              <image class="image-basics-icon" src="{{item ? item : '../../images/img_lost_icon.png'}}" style="width: 90rpx;height: 90rpx;margin-left: {{index === 0 ? '0rpx' : '5rpx'}};"></image>
+            </block>
+          </view>
+        </block>
+        <!-- 单个回忆的记录信息栏 -->
+        <text class="general-memoryCell-mostOneLine" style="margin: 5rpx 130rpx 20rpx 30rpx;color: #CACED1;font-size: 24rpx;" space="nbsp">{{item.date + ' ' + ' ' + ' ' + ' ' + item.simpleAddress}}</text>
+        <image class="image-memoryCell-editorIcon" src="../../images/img_editor_icon.png" data-id="{{item.id}}" data-title="{{item.title}}" catchtap="onClickEditorMemory"></image>
+      </view>
+    </block>
+  </block>
+  <!-- 没有回忆存在时 -->
+  <block wx:else>
+    <!-- 暂无回忆的提示栏 -->
+    <view class="view-noMemoryTip-box">
+      <!-- 暂无回忆的图标 -->
+      <image class="image-basics-icon" src="../../images/img_empty_icon.png" style="width: 128rpx;height: 128rpx;"></image>
+      <!-- 暂无回忆的提示语 -->
+      <text style="color: #467B73;font-size: 32rpx;margin-top: 10rpx;">暂无回忆</text>
+    </view>
+  </block>
+  <!-- 添加回忆的图标 -->
+  <image class="image-addMemory-icon" src="../../images/img_add_icon.png" bindtap="onClickAddMemory"></image>
+  <!-- 是否显示回忆详情框 -->
+  <block wx:if="{{isShowMemoryDetail}}">
+    <!-- 回忆详情弹窗的蒙版 -->
+    <view class="view-popupMask-box" bindtap="onClickMemoryDetailMask"></view>
+    <!-- 回忆详情框 -->
+    <view class="view-memoryDetail-box" style="padding-bottom: 10rpx;">
+      <!-- 回忆详情的标题栏 -->
+      <view class="general-memoryDetail-generalBox" style="margin-top: 20rpx;">
+        <!-- 回忆详情的标题图标 -->
+        <image class="image-basics-icon" src="../../images/img_memory_detail_title_icon.png" style="width: 32rpx;height: 32rpx;"></image>
+        <!-- 回忆详情的标题内容 -->
+        <text class="text-memoryDetail-generalText" style="font-weight: bold;">{{memoryDetail.title}}</text>
+      </view>
+      <!-- 内容分割 -->
+      <view class="view-memoryDetail-cutLine"></view>
+      <!-- 回忆详情是否存在云图片列表 -->
+      <block wx:if="{{memoryDetail.cloudPicPathList.length > 0}}">
+        <!-- 回忆详情图片列表栏 -->
+        <view class="general-memoryDetail-generalBox" style="flex-wrap: wrap;">
+          <!-- 遍历本地图片列表 -->
+          <block wx:for="{{memoryDetail.localPicPathList}}" wx:key="*this">
+            <!-- 回忆详情单个图片显示 -->
+            <image class="image-basics-icon" src="{{item ? item : '../../images/img_lost_icon.png'}}" data-index="{{index}}" catchtouchend="onPreviewMemoryCellPic" style="margin-left: {{(index + 1) % 5 === 1 ? '0rpx' : '10rpx'}};margin-top: {{index > 4 ? '5rpx' : '0rpx'}}; width: 100rpx;height: 100rpx;"></image>
+          </block>
+        </view>
+        <!-- 内容分割 -->
+        <view class="view-memoryDetail-cutLine"></view>
+      </block>
+      <!-- 回忆详情是否存在录音栏 -->
+      <block wx:if="{{memoryDetail.cloudRecordPath}}">
+        <!-- 回忆详情的录音栏 -->
+        <view class="general-memoryDetail-generalBox">
+          <!-- 回忆详情的录音图标 -->
+          <image class="image-basics-icon" src="../../images/img_memory_detail_record_icon.png" style="width: 32rpx;height: 32rpx;"></image>
+          <!-- 回忆详情的录音时长 -->
+          <text class="text-memoryDetail-generalText">录音时长 {{memoryDetail.recordDuration}}"</text>
+          <!-- 回忆详情的播放录音图标 -->
+          <image class="image-basics-icon" style="width: 32rpx;height: 32rpx;margin-left: 30rpx;" src="{{isPlayRecord ? '../../images/img_paush_record_icon.png' : '../../images/img_play_record_icon.png'}}" bindtap="onClickPlayRecord" data-data="{{memoryDetail.localRecordPath}}"></image>
+        </view>
+        <!-- 内容分割 -->
+        <view class="view-memoryDetail-cutLine"></view>
+      </block>
+      <!-- 回忆详情是否存在内容 -->
+      <block wx:if="{{memoryDetail.content}}">
+        <!-- 回忆详情的内容栏 -->
+        <view class="general-memoryDetail-generalBox">
+          <!-- 回忆详情的内容图标 -->
+          <image class="image-basics-icon" style="width: 32rpx;height: 32rpx;" src="../../images/img_memory_detail_content_icon.png"></image>
+          <!-- 回忆详情的具体内容 -->
+          <scroll-view class="scrollView-memoryDetail-content" scroll-y="true">
+            <text user-select>{{memoryDetail.content}}</text>
+          </scroll-view>
+        </view>
+        <!-- 内容分割 -->
+        <view class="view-memoryDetail-cutLine"></view>
+      </block>
+      <!-- 回忆详情是否存在日期 -->
+      <block wx:if="{{memoryDetail.date}}">
+        <!-- 回忆详情的日期栏 -->
+        <view class="general-memoryDetail-generalBox">
+          <!-- 回忆详情的日期图标 -->
+          <image class="image-basics-icon" style="height: 32rpx;width: 32rpx;" src="../../images/img_memory_detail_date_icon.png"></image>
+          <!-- 回忆详情的具体日期 -->
+          <text class="text-memoryDetail-generalText">{{memoryDetail.date}}</text>
+        </view>
+        <!-- 内容分割 -->
+        <view class="view-memoryDetail-cutLine"></view>
+      </block>
+      <!-- 回忆详情是否存在地址 -->
+      <block wx:if="{{memoryDetail.address && memoryDetail.address !== ' '}}">
+        <!-- 回忆详情的地址栏 -->
+        <view class="general-memoryDetail-generalBox">
+          <!-- 回忆详情的地址图标 -->
+          <image class="image-basics-icon" style="height: 32rpx;width: 32rpx;" src="../../images/img_memory_detail_address_icon.png"></image>
+          <!-- 回忆详情的具体地址 -->
+          <text class="text-memoryDetail-generalText">{{memoryDetail.address}}</text>
+        </view>
+        <!-- 内容分割 -->
+        <view class="view-memoryDetail-cutLine"></view>
+      </block>
+    </view>
+  </block>
+  <!-- 是否显示添加回忆框 -->
+  <block wx:if="{{isShowAddMemory}}">
+    <!-- 回忆详情弹窗的蒙版 -->
+    <view class="view-popupMask-box"></view>
+    <!-- 添加回忆框 -->
+    <view class="view-memoryDetail-box">
+      <!-- 添加回忆框的标题 -->
+      <view class="view-addMemory-nameBox">记录回忆</view>
+      <!-- 添加回忆的标题栏 -->
+      <view class="view-addMemory-titleBox">
+        <!-- 添加回忆标题的输入框 -->
+        <input class="input-addMemory-inputTitle" maxlength="15" placeholder="回忆的标题..." placeholder-style="color: rgba(70,123,115,0.5);" bindinput="inputMemoryTitle" />
+      </view>
+      <!-- 添加回忆的图片栏 -->
+      <view class="view-addMemory-picListBox">
+        <!-- 是否有添加图片 -->
+        <block wx:if="{{memoryDetail.localPicPathList.length > 0}}">
+          <!-- 遍历添加的本地图片列表 -->
+          <block wx:for="{{memoryDetail.localPicPathList}}" wx:key="*this">
+            <view class="view-addMemory-picCellBox" style="margin-left: {{(index + 1) % 5 === 1 ? '0rpx' : '10rpx'}};margin-top: {{index > 4 ? '5rpx' : '0rpx'}};">
+              <image class="image-addMemory-localPicCell" src="{{item}}" bindtap="onPreviewMemoryCellPic" data-index="{{index}}"></image>
+              <image class="image-addMemory-deletePicCell" src="../../images/img_delete_pic_icon.png" bindtap="onClickDeletePic" data-index="{{index}}"></image>
+            </view>
+          </block>
+        </block>
+        <!-- 是否添加的图片少于5张 -->
+        <block wx:if="{{memoryDetail.localPicPathList.length < 5}}">
+          <!-- 添加图片的按钮框 -->
+          <view class="view-addMemory-addPicBox" style="margin-left: {{memoryDetail.localPicPathList.length > 0 ? '10rpx' : '0rpx'}};" bindtap="onClickAddPic">
+            <!-- 添加图片按钮的虚线框 -->
+            <image class="image-basics-icon" src="../../images/img_dotted_box_icon.png" style="width: 100rpx;height: 100rpx;position: absolute;"></image>
+            <!-- 添加图片按钮的图标 -->
+            <image class="image-basics-icon" src="../../images/img_add_picture_icon.png" style="width: 40rpx;height: 40rpx;"></image>
+            <text>添加图片</text>
+          </view>
+        </block>
+      </view>
+      <!-- 添加回忆的录音栏 -->
+      <view class="view-addMemory-recordBox">
+        <!-- 添加回忆的录音栏图标 -->
+        <image class="image-basics-icon" src="../../images/img_record_icon.png" style="width: 32rpx;height: 32rpx;"></image>
+        <!-- 添加回忆时有本地录音文件 -->
+        <block wx:if="{{memoryDetail.localRecordPath}}">
+          <!-- 添加回忆时的录音时长提示 -->
+          <text class="text-memoryDetail-generalText">录音时长 {{memoryDetail.recordDuration}}"</text>
+          <!-- 添加回忆时的录音播放按钮 -->
+          <image class="image-basics-icon" style="width: 32rpx;height: 32rpx;margin-left: 30rpx;" src="{{isPlayRecord ? '../../images/img_paush_record_icon.png' : '../../images/img_play_record_icon.png'}}" bindtap="onClickPlayRecord" data-data="{{memoryDetail.localRecordPath}}"></image>
+          <!-- 添加回忆时的录音删除按钮 -->
+          <image class="image-addMemory-deleteRecord" src="../../images/img_delete_record_icon.png" bindtap="onClickDeleteRecord"></image>
+        </block>
+        <!-- 添加回忆时无本地录音文件 -->
+        <block wx:else>
+          <text class="text-memoryDetail-generalText">当前暂无录音</text>
+        </block>
+      </view>
+      <!-- 添加回忆的内容栏 -->
+      <view class="view-addMemory-contentBox">
+        <!-- 添加回忆内容的输入框 -->
+        <textarea class="textarea-addMemory-content" maxlength="-1" placeholder="回忆的内容..." bindinput="inputMemoryContent" placeholder-style="color: rgba(70,123,115,0.5);" disable-default-padding="true" cursor-spacing="30"></textarea>
+      </view>
+      <!-- 添加回忆的按钮栏 -->
+      <view class="view-addMemory-buttonBox">
+        <!-- 添加回忆的返回按钮 -->
+        <image class="image-addMemory-button" src="../../images/img_add_memory_back_icon.png" bindtap="onClickAddMemoryBack"></image>
+        <!-- 添加回忆的录音按钮 -->
+        <image class="image-addMemory-button" src="../../images/img_add_memory_record_icon.png" catchtouchstart="onTouchStartRecord" catchtouchend="onTouchEndRecord" catchtouchcancel="onTouchCancelRecord"></image>
+        <!-- 添加回忆的记录按钮 -->
+        <image class="image-addMemory-button" src="../../images/img_add_memory_write_icon.png" bindtap="onClickAddMemoryWrite"></image>
+      </view>
+    </view>
+  </block>
+</view>

@@ -1,0 +1,272 @@
+.view-memory-page {
+  position: relative;
+  left: 0;
+  top: 0;
+  /* 可视的最大高度 */
+  min-height: 100vh;
+  width: 100%;
+  display: block;
+  /* 小程序背景色 */
+  background-color: #FBF2E3;
+}
+
+.view-top-box {
+  position: relative;
+  margin-top: 0rpx;
+  width: 100%;
+  background-color: #467B73;
+  border-bottom-left-radius: 50rpx;
+  border-bottom-right-radius: 50rpx;
+  /* 防止子级的margin影响父级 */
+  overflow: hidden;
+}
+
+/* 内容横向 垂直居中的view样式 */
+.view-centerY-box {
+  position: relative;
+  margin: 10rpx 35rpx 0rpx 35rpx;
+  display: flex;
+  /* 垂直居中 */
+  align-items: center;
+}
+
+/* 基础图标的image样式 */
+.image-basics-icon {
+  position: relative;
+  /* 防止图片被压缩变形 */
+  flex-shrink: 0;
+}
+
+/* #FEFFFF 30大小的text样式 */
+.text-whiteThirty-content {
+  position: relative;
+  color: #FEFFFF;
+  font-size: 30rpx;
+}
+
+.view-noMemoryTip-box {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  /* 自偏移实现屏幕居中 */
+  transform: translateX(-50%)translateY(-50%);
+  display: flex;
+  /* 纵向排列 */
+  flex-direction: column;
+  align-items: center;
+  /* 水平居中 */
+  justify-content: center;
+}
+
+.view-memoryCell-box {
+  position: relative;
+  background-color: #FEFFFF;
+  border-radius: 30rpx;
+  margin: 0rpx 35rpx 0rpx 35rpx;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
+
+/* 最多显示一行的通用样式 */
+.general-memoryCell-mostOneLine {
+  position: relative;
+  /* 将对象作为弹性伸缩盒子模型显示 */
+  display: -webkit-box;
+  /* 限制在一个块元素显示的文本的行数 */
+  -webkit-line-clamp: 1;
+  /* 设置或检索伸缩盒对象的子元素的排列方式 */
+  -webkit-box-orient: vertical;
+  /* 隐藏超出部分 */
+  overflow: hidden;
+}
+
+.image-memoryCell-editorIcon {
+  position: absolute;
+  width: 48rpx;
+  height: 48rpx;
+  right: 35rpx;
+  top: 50%;
+  transform: translateY(-50%);
+  flex-shrink: 0;
+}
+
+.image-addMemory-icon {
+  position: fixed;
+  width: 100rpx;
+  height: 100rpx;
+  right: 42rpx;
+  bottom: 70rpx;
+  flex-shrink: 0;
+}
+
+/* 弹出框蒙版样式 */
+.view-popupMask-box {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0rpx;
+  background-color: rgba(51, 51, 51, 0.5);
+  overflow: hidden;
+}
+
+.view-memoryDetail-box {
+  position: fixed;
+  left: 45rpx;
+  right: 45rpx;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: #FBF2E3;
+  border-radius: 30rpx;
+}
+
+/* 回忆详情内容栏的通用样式 */
+.general-memoryDetail-generalBox {
+  position: relative;
+  margin: 0rpx 35rpx 0rpx 35rpx;
+  display: flex;
+  align-items: center;
+}
+
+/* 回忆详情框的text样式 */
+.text-memoryDetail-generalText {
+  position: relative;
+  color: #467B73;
+  font-size: 30rpx;
+  margin-left: 10rpx;
+}
+
+/* 回忆详情框的内容分割线样式 */
+.view-memoryDetail-cutLine {
+  position: relative;
+  margin: 10rpx 35rpx 10rpx 35rpx;
+  background-color: #467B73;
+  height: 1rpx;
+}
+
+.scrollView-memoryDetail-content {
+  position: relative;
+  color: #467B73;
+  font-size: 30rpx;
+  margin-left: 10rpx;
+  max-height: 300rpx;
+}
+
+.view-addMemory-nameBox {
+  position: relative;
+  margin: 10rpx 35rpx 0rpx 35rpx;
+  display: flex;
+  justify-content: center;
+  font-size: 30rpx;
+  color: #467B73;
+}
+
+.view-addMemory-titleBox {
+  position: relative;
+  margin: 5rpx 35rpx 0rpx 35rpx;
+  border-bottom: 1rpx solid #467B73;
+  display: flex;
+  align-items: center;
+  padding-bottom: 10rpx;
+}
+
+.input-addMemory-inputTitle {
+  position: relative;
+  font-size: 30rpx;
+  width: 100%;
+  color: #467B73;
+}
+
+.view-addMemory-picListBox {
+  position: relative;
+  margin: 10rpx 35rpx 0rpx 35rpx;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  padding-bottom: 10rpx;
+  border-bottom: 1rpx solid #467B73;
+  overflow-wrap: break-word;
+}
+
+.view-addMemory-addPicBox {
+  position: relative;
+  width: 100rpx;
+  height: 100rpx;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  font-size: 20rpx;
+  color: #467B73;
+}
+
+.view-addMemory-picCellBox {
+  position: relative;
+  width: 100rpx;
+  height: 100rpx;
+  flex-shrink: 0;
+}
+
+.image-addMemory-localPicCell {
+  position: relative;
+  width: 100rpx;
+  height: 100rpx;
+  flex-shrink: 0;
+}
+
+.image-addMemory-deletePicCell {
+  position: absolute;
+  width: 32rpx;
+  height: 32rpx;
+  right: 0rpx;
+  top: 0rpx;
+  flex-shrink: 0;
+}
+
+.view-addMemory-recordBox {
+  position: relative;
+  margin: 10rpx 35rpx 0rpx 35rpx;
+  display: flex;
+  align-items: center;
+  padding-bottom: 10rpx;
+  border-bottom: 1rpx solid #467B73;
+  height: 50rpx;
+}
+
+.image-addMemory-deleteRecord {
+  position: absolute;
+  width: 32rpx;
+  height: 32rpx;
+  right: 30rpx;
+  flex-shrink: 0;
+}
+
+.view-addMemory-contentBox {
+  position: relative;
+  margin: 10rpx 35rpx 0rpx 35rpx;
+  border-bottom: 1rpx solid #467B73;
+}
+
+.textarea-addMemory-content {
+  position: relative;
+  font-size: 30rpx;
+  width: 100%;
+  height: 250rpx;
+  color: #467B73;
+  padding-bottom: 10rpx;
+}
+
+.view-addMemory-buttonBox {
+  position: relative;
+  margin: 20rpx 55rpx 20rpx 55rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.image-addMemory-button {
+  position: relative;
+  width: 100rpx;
+  height: 100rpx;
+  flex-shrink: 0;
+}

@@ -1,0 +1,15 @@
+{
+  "name": "get_notice",
+  "version": "1.0.1",
+  "description": "Get notice.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Trick",
+  "date": "2022-06-28",
+  "license": "ISC",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.1"
+  }
+}
