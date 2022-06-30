@@ -74,6 +74,54 @@ Page({
   },
 
   /**
+   * 触发下拉刷新时执行
+   */
+  async onPullDownRefresh() {
+    let that = this;
+
+    try {
+      wx.showLoading({
+        title: '更新回忆中',
+        mask: true
+      })
+      that.getNoticeFromCloud();
+      await that.getMemoryListFromCloud(0);
+      wx.stopPullDownRefresh();
+      wx.hideLoading();
+    } catch (err) {
+      app.showErrorTip();
+    }
+  },
+
+  /**
+   * 触发上拉触底时执行
+   */
+  async onReachBottom() {
+    let that = this;
+
+    try {
+      let currentIndex: number = that.data.memoryList.length;
+
+      if (currentIndex === that.data.memorySum) {
+        wx.showToast({
+          title: '回忆到底啦',
+          icon: 'none',
+          duration: 1500
+        })
+      } else {
+        wx.showLoading({
+          title: '加载回忆中',
+          mask: true
+        })
+        await that.getMemoryListFromCloud(currentIndex);
+        wx.hideLoading();
+      }
+    } catch (err) {
+      app.showErrorTip();
+    }
+  },
+
+  /**
    * 从云端获取公告
    */
   getNoticeFromCloud(): void {
@@ -88,7 +136,9 @@ Page({
         })
         wx.setStorageSync(app.globalData.noticeCacheName, res.result.notice);
       }
-    }).catch(() => { })
+    }).catch(() => {
+      app.showErrorTip();
+    })
   },
 
   /**
@@ -207,6 +257,7 @@ Page({
       return memoryList;
     } catch (err) {
       console.log('处理回忆列表云文件错误', err);
+      app.showErrorTip();
 
       return memoryList;
     }
