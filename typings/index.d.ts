@@ -10,6 +10,10 @@ interface IAppOption {
     memorySharePicCloudPath: string;
     /** 公告缓存名 */
     noticeCacheName: string;
+    /** 回忆列表缓存名 */
+    memoryListCacheName: string;
+    /** 回忆总数缓存名 */
+    memorySumCacheName: string;
   };
   /** 检测小程序版本 有新版本则自动更新 */
   checkAppVersion(): void;

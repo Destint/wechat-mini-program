@@ -13,9 +13,9 @@ Page({
     /** 公告 */
     notice: <string>(wx.getStorageSync(app.globalData.noticeCacheName) ? wx.getStorageSync(app.globalData.noticeCacheName) : ''),
     /** 回忆总数 */
-    memorySum: <number>0,
+    memorySum: <number>(wx.getStorageSync(app.globalData.memorySumCacheName) ? wx.getStorageSync(app.globalData.memorySumCacheName) : 0),
     /** 回忆列表 */
-    memoryList: <memoryDetail[]>[],
+    memoryList: <memoryDetail[]>(wx.getStorageSync(app.globalData.memoryListCacheName) ? wx.getStorageSync(app.globalData.memoryListCacheName) : []),
     /** 是否显示回忆详情 */
     isShowMemoryDetail: <boolean>false,
     /** 单个回忆详情 */
@@ -36,10 +36,8 @@ Page({
       title: '载入回忆中',
       mask: true
     })
-    // that.getNoticeFromCloud();
-    // console.log('开始准备获取回忆列表')
-    // await that.getMemoryListFromCloud(0);
-    // console.log('获取回忆列表完成3')
+    that.getNoticeFromCloud();
+    await that.getMemoryListFromCloud(0);
     wx.hideLoading();
   },
 
@@ -100,7 +98,6 @@ Page({
   async getMemoryListFromCloud(currentIndex: number): Promise<void> {
     let that = this;
     let promise: Promise<boolean> = new Promise((resolve) => {
-      console.log('开始准备获取回忆列表1')
       wx.cloud.callFunction({
         name: 'getMemoryList',
         data: {
@@ -108,10 +105,23 @@ Page({
         }
       }).then(async (res) => {
         if (res.result && res.result.result) {
-          console.log('成功获取回忆列表', res.result);
-          console.log('开始处理云图片到本地')
-          let partialMemoryList: AnyObject[] = await that.handleMemoryCloudPicToLocal(res.result.partialMemoryList);
-          console.log('开始处理云图片到本地结束', partialMemoryList)
+          let partialMemoryList: memoryDetail[] = await that.handleMemoryCloudFileToLocal(res.result.partialMemoryList);
+
+          if (currentIndex === 0) {
+            that.setData({
+              memoryList: partialMemoryList,
+              memorySum: res.result.memorySum
+            })
+            wx.setStorageSync(app.globalData.memoryListCacheName, partialMemoryList);
+            wx.setStorageSync(app.globalData.memorySumCacheName, res.result.memorySum);
+          } else {
+            let preMemoryList: memoryDetail[] = that.data.memoryList;
+
+            preMemoryList = preMemoryList.concat(partialMemoryList);
+            that.setData({
+              memoryList: preMemoryList
+            })
+          }
           resolve(true);
         } else {
           resolve(false);
@@ -120,42 +130,60 @@ Page({
         resolve(false);
       })
     })
-    console.log('获取回忆列表完成1')
     let result = await promise;
-    console.log('获取回忆列表完成2', result)
+
     if (!result) app.showErrorTip();
   },
 
   /**
-   * 处理回忆列表的云图片到本地路径
+   * 处理回忆列表的云文件到本地路径
    * @param memoryList 需要处理的回忆列表
    */
-  async handleMemoryCloudPicToLocal(memoryList: AnyObject[]): Promise<AnyObject[]> {
+  async handleMemoryCloudFileToLocal(memoryList: memoryDetail[]): Promise<memoryDetail[]> {
     if (!memoryList || memoryList.length === 0) return memoryList;
-    let that = this;
     let proArr: Promise<boolean>[] = [];
 
     try {
       for (let i: number = 0; i < memoryList.length; i++) {
         let cloudPicPathList: string[] = memoryList[i].cloudPicPathList;
+        let cloudRecordPath: string = memoryList[i].cloudRecordPath;
 
-        console.log('回忆索引' + i + '的云图片列表', cloudPicPathList);
+        if (cloudRecordPath) {
+          let localRecordPathDicKey: string = cloudRecordPath.slice(cloudRecordPath.lastIndexOf('/') + 1);
+          let localRecordPath: string = app.checkHasLocalFilePath(localRecordPathDicKey);
+
+          if (localRecordPath === '') {
+            proArr.push(new Promise((resolve) => {
+              app.downloadTempFilePath(localRecordPathDicKey, cloudRecordPath).then((res) => {
+                memoryList[i].localRecordPath = res;
+                resolve(true);
+              }).catch(() => {
+                memoryList[i].localRecordPath = '';
+                resolve(true);
+              })
+            }))
+            // 限制promise数组最大并发数为8 现为串行 后续需优化
+            if (proArr.length === 8) {
+              await Promise.all(proArr);
+              proArr = [];
+            }
+          } else {
+            memoryList[i].localRecordPath = localRecordPath;
+          }
+        } else {
+          memoryList[i].localRecordPath = '';
+        }
         if (!cloudPicPathList || cloudPicPathList.length === 0) continue;
         for (let j: number = 0; j < cloudPicPathList.length; j++) {
-          console.log('开始处理回忆索引' + i + '的云图片列表' + j, cloudPicPathList[j]);
           if (!cloudPicPathList[j]) {
-            console.log('处理回忆索引' + i + '的云图片列表' + j + '的云图片不存在');
             memoryList[i].localPicPathList[j] = '';
           } else {
             let localFilePathDicKey: string = cloudPicPathList[j].slice(cloudPicPathList[j].lastIndexOf('/') + 1);
-            console.log('开始处理回忆索引' + i + '的云图片列表' + j + '的云图片字典名', localFilePathDicKey);
             let localPicPath: string = app.checkHasLocalFilePath(localFilePathDicKey);
-            console.log('开始处理回忆索引' + i + '的云图片列表' + j + '的本地路径', localPicPath);
+
             if (localPicPath === '') {
-              proArr.push(new Promise(async (resolve) => {
-                console.log('开始下载回忆索引' + i + '的云图片列表' + j + '的云图片', cloudPicPathList[j]);
-                await app.downloadTempFilePath(localFilePathDicKey, cloudPicPathList[j]).then((res) => {
-                  console.log('下载回忆索引' + i + '的云图片列表' + j + '的云图片完成', res);
+              proArr.push(new Promise((resolve) => {
+                app.downloadTempFilePath(localFilePathDicKey, cloudPicPathList[j]).then((res) => {
                   memoryList[i].localPicPathList[j] = res;
                   resolve(true);
                 }).catch(() => {
@@ -163,26 +191,23 @@ Page({
                   resolve(true);
                 })
               }))
+              // 限制promise数组最大并发数为8 现为串行 后续需优化
+              if (proArr.length === 8) {
+                await Promise.all(proArr);
+                proArr = [];
+              }
             } else {
               memoryList[i].localPicPathList[j] = localPicPath;
             }
           }
         }
       }
-      // while (proArr.length > 0) {
-      //   await Promise.all(proArr.splice(0, 5));
-      // }
-      // console.log('处理回忆列表云图片完成', memoryList);
-      // let done = Promise.race(proArr);
-      // done.then(() => {
-      //   proArr.splice(proArr.indexOf(done), 1);
-      // })
-      await Promise.all(proArr).then(() => {
-        console.log('处理回忆列表云图片完成', memoryList);
-      })
+      await Promise.all(proArr);
+
       return memoryList;
     } catch (err) {
-      console.log('处理回忆列表云图片错误', err);
+      console.log('处理回忆列表云文件错误', err);
+
       return memoryList;
     }
   },
