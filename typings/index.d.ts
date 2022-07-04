@@ -19,8 +19,11 @@ interface IAppOption {
   checkAppVersion(): void;
   /** 上传访问记录到云端 */
   uploadAccessToCloud(): void;
-  /** 显示错误提示 */
-  showErrorTip(): void;
+  /**
+   * 显示提示
+   * @param tip 提示内容
+   */
+  showToast(tip: string): void;
   /**
    * 检测本地图片路径是否存在
    * @param localFilePathDicKey 本地图片路径字典的key

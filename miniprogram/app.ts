@@ -43,11 +43,12 @@ App<IAppOption>({
     })
   },
 
-  showErrorTip(): void {
+  showToast(tip: string): void {
+    tip = tip ? tip : '网络异常请重试';
     wx.showToast({
-      title: '网络异常请重试',
+      title: tip,
       icon: 'none',
-      duration: 2000
+      duration: 1500
     })
   },
 

@@ -233,6 +233,12 @@
   height: 50rpx;
 }
 
+.progress-addMemory-recordPlayProgress {
+  position: relative;
+  margin-left: 20rpx;
+  width: 200rpx;
+}
+
 .image-addMemory-deleteRecord {
   position: absolute;
   width: 32rpx;

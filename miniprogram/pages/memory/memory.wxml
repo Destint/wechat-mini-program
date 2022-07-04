@@ -184,6 +184,7 @@
           <text class="text-memoryDetail-generalText">录音时长 {{memoryDetail.recordDuration}}"</text>
           <!-- 添加回忆时的录音播放按钮 -->
           <image class="image-basics-icon" style="width: 32rpx;height: 32rpx;margin-left: 30rpx;" src="{{isPlayRecord ? '../../images/img_paush_record_icon.png' : '../../images/img_play_record_icon.png'}}" bindtap="onClickPlayRecord" data-data="{{memoryDetail.localRecordPath}}"></image>
+          <progress class="progress-addMemory-recordPlayProgress" percent="{{playRecordProgress}}" stroke-width="3" color="#10AEFF"></progress>
           <!-- 添加回忆时的录音删除按钮 -->
           <image class="image-addMemory-deleteRecord" src="../../images/img_delete_record_icon.png" bindtap="onClickDeleteRecord"></image>
         </block>
