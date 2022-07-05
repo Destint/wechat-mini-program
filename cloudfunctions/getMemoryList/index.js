@@ -10,6 +10,7 @@ exports.main = async (event, context) => {
     let memoryDoc = await db.collection('memory').where({
       _openid: wxContext.OPENID
     }).get();
+
     if (!memoryDoc.data[0]) {
       await db.collection('memory').add({
         data: {
@@ -17,6 +18,7 @@ exports.main = async (event, context) => {
           _openid: wxContext.OPENID
         }
       });
+
       return {
         result: true,
         partialMemoryList: []

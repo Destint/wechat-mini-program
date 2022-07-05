@@ -5,6 +5,10 @@
  */
 const app = getApp<IAppOption>(); // App全局管理
 const recorderManager = wx.getRecorderManager(); // 录音全局管理器
+const locationSDK = require('../../utils/qqmap-wx-jssdk.js'); // 引入获取地理位置的SDK
+const locationManager = new locationSDK({
+  key: '3XKBZ-WP4CG-KQVQM-IJ2WK-7QAE7-2ZFKZ'
+}); // 位置管理器
 
 Page({
   /** 页面的初始数据 */
@@ -33,19 +37,21 @@ Page({
   isRecording: <boolean>false,
   /** 音频播放器 */
   audioPlayer: <WechatMiniprogram.InnerAudioContext>{},
+  /** 是否正在记录回忆 */
+  isWritingMemory: <boolean>false,
 
   /**
    * 页面创建时执行
    */
   async onLoad(): Promise<void> {
-    // let that = this;
-    // wx.showLoading({
-    //   title: '载入回忆中',
-    //   mask: true
-    // })
-    // that.getNoticeFromCloud();
-    // await that.getMemoryListFromCloud(0);
-    // wx.hideLoading();
+    let that = this;
+    wx.showLoading({
+      title: '载入回忆中',
+      mask: true
+    })
+    that.getNoticeFromCloud();
+    await that.getMemoryListFromCloud(0);
+    wx.hideLoading();
   },
 
   /**
@@ -294,6 +300,7 @@ Page({
   onClickMemoryDetailMask(): void {
     let that = this;
 
+    that.playRecordEnd();
     that.setData({
       memoryDetail: <memoryDetail>{},
       isShowPopup: <boolean>false,
@@ -392,16 +399,6 @@ Page({
     } catch (err) {
       app.showToast('网络异常请重试');
     }
-  },
-
-  /**
-   * 点击添加回忆页的记录事件
-   */
-  onClickAddMemoryWrite(): void {
-    let that = this;
-
-    console.log('当前添加的回忆内容', that.data.memoryDetail);
-    that.playRecordEnd();
   },
 
   /**
@@ -703,6 +700,442 @@ Page({
       memoryDetail.content = content;
       that.setData({
         memoryDetail: <memoryDetail>memoryDetail
+      })
+    } catch (err) {
+      app.showToast('网络异常请重试');
+    }
+  },
+
+  /**
+ * 点击添加回忆页的记录事件
+ */
+  onClickAddMemoryWrite(): void {
+    let that = this;
+
+    try {
+      let memoryDetail: memoryDetail = that.data.memoryDetail;
+
+      if (memoryDetail.title === '') {
+        app.showToast('回忆标题不能为空');
+
+        return;
+      }
+      if (that.isWritingMemory === true) return;
+      that.isWritingMemory = true;
+      wx.showModal({
+        title: '温馨提示',
+        content: '是否记录当前回忆',
+        cancelText: '取消',
+        confirmText: '确定'
+      }).then(async (res) => {
+        if (res.confirm) {
+          let checkContent: string = memoryDetail.title + memoryDetail.content;
+
+          wx.showLoading({
+            title: '记录中...',
+            mask: true
+          })
+          that.isWritingMemory = false;
+          that.playRecordEnd();
+          if (!await that.checkMsgSec(checkContent)) {
+            wx.hideLoading();
+            wx.showModal({
+              title: '温馨提示',
+              content: '回忆存在违规信息',
+              showCancel: false,
+              confirmText: '确定'
+            })
+
+            return;
+          }
+          await that.startWriteMemory();
+        } else {
+          that.isWritingMemory = false;
+        }
+      })
+    } catch (err) {
+      app.showToast('网络异常请重试');
+    }
+  },
+
+  /**
+   * 检测内容是否合规
+   * @param content 检测的内容
+   */
+  async checkMsgSec(content: string): Promise<boolean> {
+    let result: boolean = true;
+
+    try {
+      if (!content) return result;
+      await wx.cloud.callFunction({
+        name: 'checkMsgSec',
+        data: {
+          content: content
+        }
+      }).then((res) => {
+        if (res.result && res.result.result && res.result.data && res.result.data.errCode === 0) {
+          if (res.result.data.result && res.result.data.result.suggest !== 'pass') {
+            result = false;
+          }
+        }
+      }).catch(() => {
+        app.showToast('网络异常请重试');
+      })
+    } catch (err) {
+      app.showToast('网络异常请重试');
+    }
+
+    return result;
+  },
+
+  /**
+   * 开始记录回忆
+   */
+  async startWriteMemory(): Promise<void> {
+    let that = this;
+
+    try {
+      await that.uploadLocalFileToCloud();
+      await that.getCurrentAddressInfo();
+      await that.uploadMemoryToCloud();
+      that.finishWriteMemory();
+    } catch (err) {
+      app.showToast('网络异常请重试');
+    }
+  },
+
+  /**
+   * 上传本地文件到云端
+   */
+  async uploadLocalFileToCloud(): Promise<void> {
+    let that = this;
+    let proArr: Promise<boolean>[] = [];
+
+    try {
+      let memoryDetail: memoryDetail = that.data.memoryDetail;
+      let currentUserInfo: AnyObject = await that.getCurrentUserInfo();
+
+      memoryDetail.id = currentUserInfo.currentId;
+      memoryDetail.date = currentUserInfo.currentDate;
+      if (memoryDetail.localRecordPath !== '') {
+        proArr.push(new Promise((resolve) => {
+          wx.cloud.uploadFile({
+            cloudPath: 'record/' + currentUserInfo.openId + '/' + currentUserInfo.currentId + '.mp3',
+            filePath: memoryDetail.localRecordPath
+          }).then((res) => {
+            memoryDetail.cloudRecordPath = res.fileID;
+            resolve(true);
+          }).catch(() => {
+            resolve(true);
+          })
+        }))
+      }
+      for (let i = 0; i < memoryDetail.localPicPathList.length; i++) {
+        proArr.push(new Promise((resolve) => {
+          wx.cloud.uploadFile({
+            cloudPath: currentUserInfo.openId + '/' + currentUserInfo.currentId + i + '.jpg',
+            filePath: memoryDetail.localPicPathList[i]
+          }).then((res) => {
+            memoryDetail.cloudPicPathList[i] = res.fileID;
+            resolve(true);
+          }).catch(() => {
+            resolve(true);
+          })
+        }))
+      }
+      await Promise.all(proArr).then(() => {
+        that.setData({
+          memoryDetail: <memoryDetail>memoryDetail
+        })
+      }).catch(() => {
+        app.showToast('网络异常请重试');
+      })
+    } catch (err) {
+      app.showToast('网络异常请重试');
+    }
+  },
+
+  /**
+   * 获取当前用户信息
+   */
+  async getCurrentUserInfo(): Promise<AnyObject> {
+    let result: AnyObject = {};
+
+    try {
+      await wx.cloud.callFunction({
+        name: 'getCurrentUserInfo'
+      }).then((res) => {
+        if (res.result && res.result.result) {
+          result = res.result;
+        }
+      }).catch(() => {
+        app.showToast('网络异常请重试');
+      })
+    } catch (err) {
+      app.showToast('网络异常请重试');
+    }
+
+    return result;
+  },
+
+  /**
+   * 获取当前地址信息
+   */
+  async getCurrentAddressInfo(): Promise<void> {
+    let that = this;
+
+    try {
+      let p: Promise<boolean> = new Promise((resolve) => {
+        wx.startLocationUpdate({
+          success: () => {
+            wx.onLocationChange(async (res) => {
+              wx.offLocationChange();
+              wx.stopLocationUpdate();
+              await that.getCurrentLocation(res.latitude, res.longitude);
+              resolve(true);
+            })
+            wx.onLocationChangeError(() => {
+              wx.offLocationChange();
+              wx.stopLocationUpdate();
+              resolve(true);
+            })
+          },
+          fail: () => {
+            resolve(true);
+          }
+        })
+      })
+
+      await p;
+    } catch (err) {
+      app.showToast('网络异常请重试');
+    }
+  },
+
+  /**
+   * 根据经纬度获取当前位置信息
+   * @param latitude 纬度
+   * @param longitude 经度
+   */
+  async getCurrentLocation(latitude: number, longitude: number): Promise<void> {
+    let that = this;
+
+    try {
+      let p: Promise<boolean> = new Promise((resolve) => {
+        locationManager.reverseGeocoder({
+          location: {
+            latitude: latitude,
+            longitude: longitude
+          },
+          success: async (res: any) => {
+            if (res && res.result) {
+              let address: string = res.result.address ? res.result.address : ''; // 详细地址
+              let city: string = res.result.ad_info.city ? res.result.ad_info.city : ''; // 城市
+              let district: string = res.result.ad_info.district ? res.result.ad_info.district : ''; // 区
+              let simpleAddress: string = district ? district : city; // 简易地址
+
+              await that.getCurrentWeather(simpleAddress, address);
+            }
+            resolve(true);
+          },
+          fail: () => {
+            resolve(true);
+          }
+        })
+      })
+
+      await p;
+    } catch (err) {
+      app.showToast('网络异常请重试');
+    }
+  },
+
+  /**
+   * 根据地址获取天气信息
+   * @param simpleAddress 简易地址
+   * @param address 详细地址
+   */
+  async getCurrentWeather(simpleAddress: string, address: string): Promise<void> {
+    let that = this;
+
+    try {
+      let memoryDetail: memoryDetail = that.data.memoryDetail;
+      let p: Promise<boolean> = new Promise((resolve) => {
+        wx.request({
+          url: 'https://free-api.heweather.net/s6/weather/now',
+          data: {
+            location: simpleAddress,
+            key: "2ce65b27e7784d0f85ecd7b8127f5e2d"
+          },
+          success: (res: any) => {
+            let weather: string = res.data.HeWeather6[0].now.cond_txt;
+            let temperature: string = res.data.HeWeather6[0].now.fl + '℃';
+
+            memoryDetail.address = address + ' ' + weather + ' ' + temperature;
+            memoryDetail.simpleAddress = simpleAddress + ' ' + weather + ' ' + temperature;
+            that.setData({
+              memoryDetail: <memoryDetail>memoryDetail
+            })
+            resolve(true);
+          },
+          fail: () => {
+            resolve(true);
+          }
+        })
+      })
+
+      await p;
+    } catch (err) {
+      app.showToast('网络异常请重试');
+    }
+  },
+
+  /**
+   * 上传添加的回忆到云端
+   */
+  async uploadMemoryToCloud(): Promise<void> {
+    let that = this;
+
+    try {
+      let memoryDetail: memoryDetail = that.data.memoryDetail;
+
+      await wx.cloud.callFunction({
+        name: 'uploadMemory',
+        data: {
+          memory: memoryDetail
+        }
+      }).then(async (res) => {
+        if (res.result && res.result.result) {
+          let partialMemoryList: memoryDetail[] = await that.handleMemoryCloudFileToLocal(res.result.partialMemoryList);
+
+          that.setData({
+            memoryList: <memoryDetail[]>partialMemoryList,
+            memorySum: <number>res.result.memorySum
+          })
+          wx.setStorageSync(app.globalData.memoryListCacheName, partialMemoryList);
+          wx.setStorageSync(app.globalData.memorySumCacheName, res.result.memorySum);
+        }
+      }).catch(() => {
+        app.showToast('网络异常请重试');
+      })
+    } catch (err) {
+      app.showToast('网络异常请重试');
+    }
+  },
+
+  /**
+   * 添加回忆完成
+   */
+  finishWriteMemory(): void {
+    let that = this;
+
+    try {
+      let memoryDetail: memoryDetail = that.initMemoryCellData();
+
+      that.setData({
+        memoryDetail: <memoryDetail>memoryDetail,
+        isShowPopup: <boolean>false,
+        isShowAddMemory: <boolean>false
+      })
+      wx.hideLoading();
+      app.showToast('记录成功');
+    } catch (err) {
+      app.showToast('网络异常请重试');
+    }
+  },
+
+  /**
+   * 点击回忆列表的编辑事件
+   * @param e 监听点击的对象
+   */
+  onClickEditorMemory(e: WechatMiniprogram.BaseEvent): void {
+    let that = this;
+
+    try {
+      let memoryId: number = e.currentTarget.dataset.id;
+      let memoryTitle: string = e.currentTarget.dataset.title;
+
+      wx.showActionSheet({
+        itemList: ['删除该回忆'],
+        success: (res) => {
+          if (res.tapIndex === 0) that.deleteMemoryById(memoryId, memoryTitle);
+        },
+        fail: () => {
+          app.showToast('网络异常请重试');
+        }
+      })
+    } catch (err) {
+      app.showToast('网络异常请重试');
+    }
+  },
+
+  /**
+   * 通过回忆id删除回忆
+   * @param memoryId 要删除的回忆的id
+   * @param memoryTitle 要删除的回忆的标题
+   */
+  deleteMemoryById(memoryId: number, memoryTitle: string): void {
+    let that = this;
+
+    try {
+      wx.showModal({
+        title: '温馨提示',
+        content: '是否删除回忆《' + memoryTitle + '》',
+        cancelText: '取消',
+        confirmText: '确定'
+      }).then(async (res) => {
+        if (res.confirm) {
+          wx.showLoading({
+            title: '删除中...',
+            mask: true
+          })
+          await wx.cloud.callFunction({
+            name: 'deleteMemory',
+            data: {
+              memoryId: memoryId
+            }
+          }).then((res) => {
+            if (res.result && res.result.result) {
+              let memoryList: memoryDetail[] = that.data.memoryList;
+              let memorySum: number = that.data.memorySum;
+              let deleteMemory: memoryDetail = <memoryDetail>memoryList.find((object) => {
+                return object.id === memoryId;
+              })
+              let deleteMemoryIndex: number = memoryList.findIndex((object) => {
+                return object.id === memoryId;
+              })
+              let cloudPicPathList: string[] = deleteMemory.cloudPicPathList;
+              let cloudRecordPath: string = deleteMemory.cloudRecordPath;
+
+              for (let i = 0; i < cloudPicPathList.length; i++) {
+                if (cloudPicPathList[i]) {
+                  let localFilePathDicKey: string = cloudPicPathList[i].slice(cloudPicPathList[i].lastIndexOf('/') + 1);
+
+                  app.deleteLocalFilePathDic(localFilePathDicKey);
+                }
+              }
+              if (cloudRecordPath) {
+                let localFilePathDicKey: string = cloudRecordPath.slice(cloudRecordPath.lastIndexOf('/') + 1);
+
+                app.deleteLocalFilePathDic(localFilePathDicKey);
+              }
+              memoryList.splice(deleteMemoryIndex, 1);
+              memorySum = memorySum - 1;
+              that.setData({
+                memoryList: <memoryDetail[]>memoryList,
+                memorySum: <number>memorySum
+              })
+              wx.setStorageSync(app.globalData.memoryListCacheName, memoryList.slice(0, 15));
+              wx.setStorageSync(app.globalData.memorySumCacheName, memorySum);
+              wx.hideLoading();
+              app.showToast('删除成功');
+            } else {
+              app.showToast('网络异常请重试');
+            }
+          }).catch(() => {
+            app.showToast('网络异常请重试');
+          })
+        }
       })
     } catch (err) {
       app.showToast('网络异常请重试');

@@ -37,6 +37,11 @@ interface IAppOption {
    * @return 临时图片路径
    */
   downloadTempFilePath(localFilePathDicKey: string, cloudFilePath: string): Promise<string>;
+  /**
+   * 删除本地文件路径的字典
+   * @param localFilePathDicKey 本地图片路径字典的key
+   */
+  deleteLocalFilePathDic(localFilePathDicKey: string): void;
 }
 
 /** 单个回忆数据详情 */

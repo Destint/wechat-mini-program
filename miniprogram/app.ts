@@ -13,34 +13,46 @@ App<IAppOption>({
   },
 
   onLaunch() {
-    // let that = this;
+    let that = this;
 
     wx.cloud.init({
       env: 'zxj-8gnakc5c52888d77',
       traceUser: true
     });
-    // that.checkAppVersion();
-    // that.uploadAccessToCloud();
+    that.checkAppVersion();
+    that.uploadAccessToCloud();
   },
 
   checkAppVersion(): void {
-    if (wx.canIUse('getUpdateManager')) {
-      const updateManager = wx.getUpdateManager();
+    let that = this;
 
-      updateManager.onCheckForUpdate((res) => {
-        if (res.hasUpdate) {
-          updateManager.onUpdateReady(() => {
-            updateManager.applyUpdate(); // 强制重启 更新小程序
-          })
-        }
-      })
+    try {
+      if (wx.canIUse('getUpdateManager')) {
+        const updateManager = wx.getUpdateManager();
+
+        updateManager.onCheckForUpdate((res) => {
+          if (res.hasUpdate) {
+            updateManager.onUpdateReady(() => {
+              updateManager.applyUpdate(); // 强制重启 更新小程序
+            })
+          }
+        })
+      }
+    } catch (err) {
+      that.showToast('网络异常请重试');
     }
   },
 
   uploadAccessToCloud(): void {
-    wx.cloud.callFunction({
-      name: 'uploadAccess'
-    })
+    let that = this;
+
+    try {
+      wx.cloud.callFunction({
+        name: 'uploadAccess'
+      })
+    } catch (err) {
+      that.showToast('网络异常请重试');
+    }
   },
 
   showToast(tip: string): void {
@@ -84,14 +96,27 @@ App<IAppOption>({
           localFilePathDic[localFilePathDicKey] = res.tempFilePath;
           wx.setStorageSync(that.globalData.localFilePathDicCacheName, localFilePathDic);
           tempFilePath = res.tempFilePath;
-        }).catch((err) => {
-          console.log('图片下载失败1', err)
+        }).catch(() => {
+          that.showToast('网络异常请重试');
         })
       }
     } catch (err) {
-      console.log('图片下载失败2', err)
+      that.showToast('网络异常请重试');
     }
 
     return tempFilePath;
+  },
+
+  deleteLocalFilePathDic(localFilePathDicKey: string): void {
+    let that = this;
+
+    try {
+      let localFilePathDic: { [key: string]: string } = wx.getStorageSync(that.globalData.localFilePathDicCacheName);
+
+      if (localFilePathDicKey && localFilePathDic && localFilePathDic[localFilePathDicKey]) {
+        delete localFilePathDic[localFilePathDicKey];
+        wx.setStorageSync(that.globalData.localFilePathDicCacheName, localFilePathDic);
+      }
+    } catch (err) { }
   }
 })

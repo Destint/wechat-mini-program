@@ -1,0 +1,15 @@
+{
+  "name": "get_current_user_info",
+  "version": "1.0.0",
+  "description": "Get current user info.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Trick",
+  "date": "2022-07-04",
+  "license": "ISC",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

@@ -93,6 +93,8 @@
           <text class="text-memoryDetail-generalText">录音时长 {{memoryDetail.recordDuration}}"</text>
           <!-- 回忆详情的播放录音图标 -->
           <image class="image-basics-icon" style="width: 32rpx;height: 32rpx;margin-left: 30rpx;" src="{{isPlayRecord ? '../../images/img_paush_record_icon.png' : '../../images/img_play_record_icon.png'}}" bindtap="onClickPlayRecord" data-data="{{memoryDetail.localRecordPath}}"></image>
+          <!-- 回忆详情的录音播放进度 -->
+          <progress class="progress-addMemory-recordPlayProgress" percent="{{playRecordProgress}}" stroke-width="3" color="#10AEFF"></progress>
         </view>
         <!-- 内容分割 -->
         <view class="view-memoryDetail-cutLine"></view>
@@ -184,6 +186,7 @@
           <text class="text-memoryDetail-generalText">录音时长 {{memoryDetail.recordDuration}}"</text>
           <!-- 添加回忆时的录音播放按钮 -->
           <image class="image-basics-icon" style="width: 32rpx;height: 32rpx;margin-left: 30rpx;" src="{{isPlayRecord ? '../../images/img_paush_record_icon.png' : '../../images/img_play_record_icon.png'}}" bindtap="onClickPlayRecord" data-data="{{memoryDetail.localRecordPath}}"></image>
+          <!-- 添加回忆时的录音播放进度 -->
           <progress class="progress-addMemory-recordPlayProgress" percent="{{playRecordProgress}}" stroke-width="3" color="#10AEFF"></progress>
           <!-- 添加回忆时的录音删除按钮 -->
           <image class="image-addMemory-deleteRecord" src="../../images/img_delete_record_icon.png" bindtap="onClickDeleteRecord"></image>
@@ -196,7 +199,7 @@
       <!-- 添加回忆的内容栏 -->
       <view class="view-addMemory-contentBox">
         <!-- 添加回忆内容的输入框 -->
-        <textarea class="textarea-addMemory-content" maxlength="-1" placeholder="回忆的内容..." bindinput="inputMemoryContent" placeholder-style="color: rgba(70,123,115,0.5);" disable-default-padding="true" cursor-spacing="30"></textarea>
+        <textarea class="textarea-addMemory-content" maxlength="2000" placeholder="回忆的内容..." bindinput="inputMemoryContent" placeholder-style="color: rgba(70,123,115,0.5);" disable-default-padding="true" cursor-spacing="30"></textarea>
       </view>
       <!-- 添加回忆的按钮栏 -->
       <view class="view-addMemory-buttonBox">
