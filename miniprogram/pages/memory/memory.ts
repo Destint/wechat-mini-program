@@ -318,13 +318,18 @@ Page({
     try {
       let index: number = e.currentTarget.dataset.index;
       let currentPic: string = that.data.memoryDetail.localPicPathList[index];
-      let picList: string[] = that.data.memoryDetail.localPicPathList;
+      let localPicPathList: string[] = that.data.memoryDetail.localPicPathList;
+      let picList: string[] = [];
 
-
-      wx.previewImage({
-        current: currentPic,
-        urls: picList
-      })
+      for (let i = 0; i < localPicPathList.length; i++) {
+        if (localPicPathList[i]) picList.push(localPicPathList[i]);
+      }
+      if (currentPic) {
+        wx.previewImage({
+          current: currentPic,
+          urls: picList
+        })
+      }
     } catch (err) {
       app.showToast('网络异常请重试');
     }
@@ -468,9 +473,7 @@ Page({
             memoryDetail: <memoryDetail>memoryDetail
           })
           wx.hideLoading();
-        }).catch(() => {
-          app.showToast('网络异常请重试');
-        })
+        }).catch(() => { })
       }
     } catch (err) {
       app.showToast('网络异常请重试');
@@ -1060,9 +1063,7 @@ Page({
         success: (res) => {
           if (res.tapIndex === 0) that.deleteMemoryById(memoryId, memoryTitle);
         },
-        fail: () => {
-          app.showToast('网络异常请重试');
-        }
+        fail: () => { }
       })
     } catch (err) {
       app.showToast('网络异常请重试');
