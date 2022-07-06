@@ -33,7 +33,7 @@
             <!-- 遍历本地图片列表 -->
             <block wx:for="{{item.localPicPathList}}" wx:key="*this">
               <!-- 单个回忆的图片单元 -->
-              <image class="image-basics-icon" src="{{item ? item : '../../images/img_lost_icon.png'}}" style="width: 90rpx;height: 90rpx;margin-left: {{index === 0 ? '0rpx' : '5rpx'}};"></image>
+              <image class="image-basics-icon" src="{{item ? item : '../../images/img_lost_icon.png'}}" style="width: 90rpx;height: 90rpx;margin-left: {{index === 0 ? '0rpx' : '5rpx'}};" mode="aspectFill"></image>
             </block>
           </view>
         </block>
@@ -77,7 +77,7 @@
           <!-- 遍历本地图片列表 -->
           <block wx:for="{{memoryDetail.localPicPathList}}" wx:key="*this">
             <!-- 回忆详情单个图片显示 -->
-            <image class="image-basics-icon" src="{{item ? item : '../../images/img_lost_icon.png'}}" data-index="{{index}}" catchtouchend="onPreviewMemoryCellPic" style="margin-left: {{(index + 1) % 5 === 1 ? '0rpx' : '10rpx'}};margin-top: {{index > 4 ? '5rpx' : '0rpx'}}; width: 100rpx;height: 100rpx;"></image>
+            <image class="image-basics-icon" src="{{item ? item : '../../images/img_lost_icon.png'}}" data-index="{{index}}" catchtouchend="onPreviewMemoryCellPic" style="margin-left: {{(index + 1) % 5 === 1 ? '0rpx' : '10rpx'}};margin-top: {{index > 4 ? '5rpx' : '0rpx'}}; width: 100rpx;height: 100rpx;" mode="aspectFill"></image>
           </block>
         </view>
         <!-- 内容分割 -->
