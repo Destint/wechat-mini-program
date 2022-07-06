@@ -1,0 +1,88 @@
+.view-mine-page {
+  position: relative;
+  left: 0;
+  top: 0;
+  /* 可视的最大高度 */
+  min-height: 100vh;
+  width: 100%;
+  display: block;
+  /* 小程序背景色 */
+  background-color: #FBF2E3;
+}
+
+.view-top-box {
+  position: relative;
+  margin-top: 0rpx;
+  width: 100%;
+  background-color: #467B73;
+  border-bottom-left-radius: 50rpx;
+  border-bottom-right-radius: 50rpx;
+  display: flex;
+  align-items: center;
+  /* 防止子级的margin影响父级 */
+  overflow: hidden;
+  padding: 10rpx 0rpx 30rpx 0rpx;
+}
+
+.image-userInfo-avatar {
+  position: relative;
+  width: 128rpx;
+  height: 128rpx;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-left: 35rpx;
+  flex-shrink: 0;
+}
+
+.text-userInfo-nickName {
+  position: relative;
+  color: #FEFFFF;
+  font-size: 30rpx;
+  margin-left: 35rpx;
+}
+
+.view-calendar-box {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 25rpx;
+  color: #FEFFFF;
+  margin: 0rpx 45rpx 0rpx auto;
+}
+
+.view-function-box {
+  position: relative;
+  margin: 0rpx 35rpx 0 35rpx;
+  background-color: #FEFFFF;
+  border-radius: 30rpx;
+  margin-top: 20rpx;
+}
+
+.view-functionCell-box {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.image-functionCell-icon {
+  position: relative;
+  width: 40rpx;
+  height: 40rpx;
+  margin-left: 30rpx;
+  flex-shrink: 0;
+}
+
+.text-functionCell-name {
+  position: relative;
+  color: #467B73;
+  font-size: 30rpx;
+  margin: 20rpx 30rpx 20rpx 30rpx;
+}
+
+.button-functionCell-general {
+  position: absolute;
+  height: 100% !important;
+  width: 100% !important;
+  background-color: transparent;
+}

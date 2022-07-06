@@ -1,0 +1,124 @@
+<!-- 防止弹窗穿透 -->
+<page-meta page-style="overflow: {{isShowPopup ? 'hidden' : 'visible'}}" />
+<!-- 我的页面总样式 -->
+<view class="view-mine-page">
+  <!-- 顶部信息栏 -->
+  <view class="view-top-box">
+    <!-- 用户头像栏 -->
+    <image class="image-userInfo-avatar" src="{{localAvatarPath ? localAvatarPath : '../../images/img_default_avatar_icon.png'}}"></image>
+    <!-- 用户昵称栏 -->
+    <text class="text-userInfo-nickName">{{nickname}}</text>
+    <!-- 是否有万年历数据 -->
+    <block wx:if="{{calendar.date}}">
+      <!-- 万年历信息栏 -->
+      <view class="view-calendar-box">
+        <!-- 万年历 —— 日期 -->
+        <text>{{calendar.date}}</text>
+        <!-- 万年历 —— 农历 -->
+        <text>{{calendar.lunar}}</text>
+        <!-- 万年历 —— 年份 -->
+        <text>{{calendar.year + ' ' + calendar.zodiac}}</text>
+        <!-- 万年历 —— 月份和天 -->
+        <text>{{calendar.month + ' ' + calendar.day}}</text>
+        <!-- 万年历 —— 节日 -->
+        <text>{{calendar.solarTerm}}</text>
+      </view>
+    </block>
+  </view>
+  <!-- 反馈信息的功能栏 -->
+  <view class="view-function-box">
+    <!-- 意见反馈功能栏 -->
+    <view class="view-functionCell-box" bindtap="onClickFeedback">
+      <!-- 意见反馈的图标 -->
+      <image class="image-functionCell-icon" src="../../images/img_feedback_icon.png"></image>
+      <!-- 意见反馈的名称 -->
+      <text class="text-functionCell-name">意见反馈</text>
+    </view>
+    <!-- 联系客服功能栏 -->
+    <view class="view-functionCell-box" style="border-top: 1rpx solid #E4E4E4;">
+      <!-- 联系客服的图标 -->
+      <image class="image-functionCell-icon" src="../../images/img_contact_icon.png"></image>
+      <!-- 联系客服的名称 -->
+      <text class="text-functionCell-name">联系客服</text>
+      <!-- 联系客服的功能按钮 -->
+      <button class="button-functionCell-general" open-type="contact"></button>
+    </view>
+  </view>
+  <!-- 设置信息的功能栏 -->
+  <view class="view-function-box">
+    <!-- 设置头像功能栏 -->
+    <view class="view-functionCell-box" bindtap="onClickSetAvatar">
+      <!-- 设置头像的图标 -->
+      <image class="image-functionCell-icon" src="../../images/img_set_avatar_icon.png"></image>
+      <!-- 设置头像的名称 -->
+      <text class="text-functionCell-name">设置头像</text>
+    </view>
+    <!-- 设置昵称功能栏 -->
+    <view class="view-functionCell-box" style="border-top: 1rpx solid #E4E4E4;" bindtap="onClickSetNickname">
+      <!-- 设置昵称的图标 -->
+      <image class="image-functionCell-icon" src="../../images/img_set_nickname_icon.png"></image>
+      <!-- 设置昵称的名称 -->
+      <text class="text-functionCell-name">设置昵称</text>
+    </view>
+    <!-- 是否有管理权限 -->
+    <block wx:if="{{hasManagePermission}}">
+      <!-- 设置公告功能栏 -->
+      <view class="view-functionCell-box" bindtap="onClickSetNotice" style="border-top: 1rpx solid #E4E4E4;">
+        <!-- 设置公告的图标 -->
+        <image class="image-functionCell-icon" src="../../images/img_set_notice_icon.png"></image>
+        <!-- 设置公告的名称 -->
+        <text class="text-functionCell-name">设置公告</text>
+      </view>
+    </block>
+  </view>
+  <!-- 特殊功能栏 -->
+  <view class="view-function-box">
+    <!-- 今日宜忌功能栏 -->
+    <view class="view-functionCell-box" bindtap="onClickSuitAndAvoid">
+      <!-- 今日宜忌的图标 -->
+      <image class="image-functionCell-icon" src="../../images/img_suit_and_avoid_icon.png"></image>
+      <!-- 今日宜忌的名称 -->
+      <text class="text-functionCell-name">今日宜忌</text>
+    </view>
+    <!-- 随机选择功能栏 -->
+    <view class="view-functionCell-box" bindtap="onClickRandomChoose" style="border-top: 1rpx solid #E4E4E4;">
+      <!-- 随机选择的图标 -->
+      <image class="image-functionCell-icon" src="../../images/img_random_choose_icon.png"></image>
+      <!-- 随机选择的名称 -->
+      <text class="text-functionCell-name">随机选择</text>
+    </view>
+    <!-- 随机笑话功能栏 -->
+    <view class="view-functionCell-box" bindtap="onClickRandomJoke" style="border-top: 1rpx solid #E4E4E4;">
+      <!-- 随机笑话的图标 -->
+      <image class="image-functionCell-icon" src="../../images/img_random_joke_icon.png"></image>
+      <!-- 随机笑话的名称 -->
+      <text class="text-functionCell-name">随机笑话</text>
+    </view>
+    <!-- 随机土味功能栏 -->
+    <view class="view-functionCell-box" bindtap="onClickRandomEarthy" style="border-top: 1rpx solid #E4E4E4;">
+      <!-- 随机土味的图标 -->
+      <image class="image-functionCell-icon" src="../../images/img_random_earthy_icon.png"></image>
+      <!-- 随机土味的名称 -->
+      <text class="text-functionCell-name">随机土味</text>
+    </view>
+  </view>
+  <!-- 关于小程序的功能栏 -->
+  <view class="view-function-box">
+    <!-- 分享小程序功能栏 -->
+    <view class="view-functionCell-box">
+      <!-- 分享小程序的图标 -->
+      <image class="image-functionCell-icon" src="../../images/img_share_app_icon.png"></image>
+      <!-- 分享小程序的名称 -->
+      <text class="text-functionCell-name">分享小程序</text>
+      <!-- 分享小程序的功能按钮 -->
+      <button class="button-functionCell-general" open-type="share"></button>
+    </view>
+    <!-- 关于小程序功能栏 -->
+    <view class="view-functionCell-box" bindtap="onClickAboutApp" style="border-top: 1rpx solid #E4E4E4;">
+      <!-- 关于小程序的图标 -->
+      <image class="image-functionCell-icon" src="../../images/img_about_app_icon.png"></image>
+      <!-- 关于小程序的名称 -->
+      <text class="text-functionCell-name">关于小程序</text>
+    </view>
+  </view>
+</view>

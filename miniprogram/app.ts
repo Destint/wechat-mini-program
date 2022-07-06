@@ -9,7 +9,9 @@ App<IAppOption>({
     memorySharePicCloudPath: 'cloud://zxj-8gnakc5c52888d77.7a78-zxj-8gnakc5c52888d77-1305877666/share/img_share_memory.png',
     noticeCacheName: 'notice',
     memoryListCacheName: 'memoryList',
-    memorySumCacheName: 'memorySum'
+    memorySumCacheName: 'memorySum',
+    nicknameCacheName: 'nickname',
+    calendarCacheName: 'calendar'
   },
 
   onLaunch() {

@@ -14,6 +14,10 @@ interface IAppOption {
     memoryListCacheName: string;
     /** 回忆总数缓存名 */
     memorySumCacheName: string;
+    /** 用户昵称缓存名 */
+    nicknameCacheName: string;
+    /** 万年历缓存名 */
+    calendarCacheName: string;
   };
   /** 检测小程序版本 有新版本则自动更新 */
   checkAppVersion(): void;
@@ -68,4 +72,26 @@ interface memoryDetail {
   localRecordPath: string;
   /** 录音时长 */
   recordDuration: number;
+}
+
+/** 万年历接口 */
+interface calendar {
+  /** 日期 */
+  date: string;
+  /** 年份 */
+  year: string;
+  /** 月份 */
+  month: string;
+  /** 天 */
+  day: string;
+  /** 生肖 */
+  zodiac: string;
+  /** 农历 */
+  lunar: string;
+  /** 节气 */
+  solarTerm: string;
+  /** 今日宜 */
+  suitable: string;
+  /** 今日忌 */
+  tapu: string;
 }
