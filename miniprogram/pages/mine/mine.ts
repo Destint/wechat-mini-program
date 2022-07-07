@@ -26,6 +26,20 @@ Page({
     isShowSetNoticeView: <boolean>false,
     /** 设置公告的内容 */
     setNoticeContent: <string>'',
+    /** 是否显示其他功能页面 */
+    isShowOtherFunctionView: <boolean>false,
+    /** 其他功能页标题 */
+    otherFunctionTitle: <string>'',
+    /** 其他功能页内容 */
+    otherFunctionContent: <string>'',
+    /** 是否显示关于小程序 */
+    isShowAboutApp: <boolean>false,
+    /** 关于小程序的内容 */
+    aboutAppContent: <string>'这是一个可以《留住回忆》的小程序。\n可选的需要小程序授权的功能：\n1、开启定位后，可在记录回忆时记下位置与天气。\n2、开启录音后，可在记录回忆时记下声音。\n3、可从相册中选择想要的图片一同记录。\n如果您在使用小程序时遇到任何问题或者您对小程序有更好的建议或想法，欢迎通过《联系客服》功能来向开发者反馈。',
+    /** 是否赞美小程序 */
+    isPraiseApp: <boolean>(wx.getStorageSync(mineApp.globalData.isPraiseAppCacheName) ? wx.getStorageSync(mineApp.globalData.isPraiseAppCacheName) : false),
+    /** 赞美小程序人数 */
+    praiseAppSum: <number>(wx.getStorageSync(mineApp.globalData.praiseAppSumCacheName) ? wx.getStorageSync(mineApp.globalData.praiseAppSumCacheName) : 0),
   },
 
   /**
@@ -205,10 +219,10 @@ Page({
           result = res.result;
         }
       }).catch(() => {
-        app.showToast('网络异常请重试');
+        mineApp.showToast('网络异常请重试');
       })
     } catch (err) {
-      app.showToast('网络异常请重试');
+      mineApp.showToast('网络异常请重试');
     }
 
     return result;
@@ -271,7 +285,7 @@ Page({
         }).catch(() => {
           mineApp.showToast('网络异常请重试');
         })
-      })
+      }).catch(() => { })
     } catch (err) {
       mineApp.showToast('网络异常请重试');
     }
@@ -527,6 +541,204 @@ Page({
           notice: notice
         }
       }).then(() => { }).catch(() => { })
+    } catch (err) {
+      mineApp.showToast('网络异常请重试');
+    }
+  },
+
+  /**
+   * 点击今日宜忌
+   */
+  onClickSuitAndAvoid(): void {
+    let that = this;
+
+    try {
+      let otherFunctionTitle: string = '今日宜忌';
+      let otherFunctionContent: string = "宜: " + that.data.calendar.suitable + "\n忌: " + that.data.calendar.tapu;
+
+      that.setData({
+        isShowOtherFunctionView: <boolean>true,
+        isShowPopup: <boolean>true,
+        otherFunctionTitle: <string>otherFunctionTitle,
+        otherFunctionContent: <string>otherFunctionContent
+      })
+    } catch (err) {
+      mineApp.showToast('网络异常请重试');
+    }
+  },
+
+  /**
+   * 点击其他功能页的蒙版事件
+   */
+  onClickOtherFunctionMask(): void {
+    let that = this;
+
+    that.setData({
+      isShowOtherFunctionView: <boolean>false,
+      isShowPopup: <boolean>false,
+      otherFunctionTitle: <string>'',
+      otherFunctionContent: <string>''
+    })
+  },
+
+  /**
+   * 点击随机笑话事件
+   */
+  onClickRandomJoke(): void {
+    let that = this;
+
+    try {
+      wx.showLoading({
+        title: '生成中...',
+        mask: true
+      })
+      wx.request({
+        url: 'https://www.mxnzp.com/api/jokes/list/random',
+        data: {
+          app_id: 'fjkpgjqmxolqnmqm',
+          app_secret: 'SEJGam9aWldEaUFtQWIyZ0FHTHZhQT09'
+        },
+        header: {
+          'content-type': 'application/json'
+        },
+        success: (res: any) => {
+          let jokeList: AnyObject[] = res.data.data;
+          let randomJoke: AnyObject = jokeList[Math.floor(Math.random() * (jokeList.length))];
+          let otherFunctionTitle: string = "随机笑话";
+          let otherFunctionContent: string = randomJoke ? randomJoke.content : '获取笑话失败请重试';
+
+          that.setData({
+            isShowOtherFunctionView: <boolean>true,
+            isShowPopup: <boolean>true,
+            otherFunctionTitle: otherFunctionTitle,
+            otherFunctionContent: otherFunctionContent
+          })
+          wx.hideLoading();
+        },
+        fail: () => {
+          mineApp.showToast('网络异常请重试');
+        }
+      })
+    } catch (err) {
+      mineApp.showToast('网络异常请重试');
+    }
+  },
+
+  /**
+   * 点击随机土味事件
+   */
+  onClickRandomEarthy(): void {
+    let that = this;
+
+    try {
+      wx.showLoading({
+        title: '生成中...',
+        mask: true
+      })
+      wx.request({
+        url: 'https://api.uomg.com/api/rand.qinghua',
+        data: {
+          format: 'json'
+        },
+        header: {
+          'content-type': 'application/json'
+        },
+        success: (res: any) => {
+          let otherFunctionTitle: string = "随机土味";
+          let otherFunctionContent: string = res.data && res.data.content ? res.data.content : '获取土味失败请重试';
+
+          that.setData({
+            isShowOtherFunctionView: <boolean>true,
+            isShowPopup: <boolean>true,
+            otherFunctionTitle: otherFunctionTitle,
+            otherFunctionContent: otherFunctionContent
+          })
+          wx.hideLoading();
+        },
+        fail: () => {
+          mineApp.showToast('网络异常请重试');
+        }
+      })
+    } catch (err) {
+      mineApp.showToast('网络异常请重试');
+    }
+  },
+
+  /**
+   * 点击关于小程序事件
+   */
+  onClickAboutApp(): void {
+    let that = this;
+
+    try {
+      that.getPraiseInfoFromCloud();
+      that.setData({
+        isShowPopup: <boolean>true,
+        isShowAboutApp: <boolean>true
+      })
+    } catch (err) {
+      mineApp.showToast('网络异常请重试');
+    }
+  },
+
+  /**
+   * 从云端获取点赞信息
+   */
+  getPraiseInfoFromCloud(): void {
+    let that = this;
+
+    try {
+      wx.cloud.callFunction({
+        name: 'getPraiseInfo'
+      }).then((res) => {
+        if (res.result && res.result.result) {
+          wx.setStorageSync(mineApp.globalData.isPraiseAppCacheName, res.result.isPraiseApp);
+          wx.setStorageSync(mineApp.globalData.praiseAppSumCacheName, res.result.praiseAppSum);
+          that.setData({
+            isPraiseApp: <boolean>res.result.isPraiseApp,
+            praiseAppSum: <number>res.result.praiseAppSum
+          })
+        }
+      })
+    } catch (err) {
+      mineApp.showToast('网络异常请重试');
+    }
+  },
+
+  /**
+   * 点击关于小程序页蒙版事件
+   */
+  onClickAboutAppMask(): void {
+    let that = this;
+
+    that.setData({
+      isShowPopup: <boolean>false,
+      isShowAboutApp: <boolean>false
+    })
+  },
+
+  /**
+   * 点击赞美小程序事件
+   */
+  onClickPraiseApp(): void {
+    let that = this;
+
+    try {
+      if (that.data.isPraiseApp === false) {
+        wx.cloud.callFunction({
+          name: 'uploadPraise'
+        }).then((res) => {
+          if (res.result && res.result.result) {
+            wx.setStorageSync(mineApp.globalData.isPraiseAppCacheName, res.result.isPraiseApp);
+            wx.setStorageSync(mineApp.globalData.praiseAppSumCacheName, res.result.praiseAppSum);
+            that.setData({
+              isPraiseApp: <boolean>res.result.isPraiseApp,
+              praiseAppSum: <number>res.result.praiseAppSum
+            })
+            mineApp.showToast('谢谢');
+          }
+        })
+      }
     } catch (err) {
       mineApp.showToast('网络异常请重试');
     }

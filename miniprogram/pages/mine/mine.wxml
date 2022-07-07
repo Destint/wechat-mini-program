@@ -62,12 +62,12 @@
       <text class="text-functionCell-name">今日宜忌</text>
     </view>
     <!-- 随机选择功能栏 -->
-    <view class="view-functionCell-box" bindtap="onClickRandomChoose" style="border-top: 1rpx solid #E4E4E4;">
-      <!-- 随机选择的图标 -->
-      <image class="image-functionCell-icon" src="../../images/img_random_choose_icon.png"></image>
-      <!-- 随机选择的名称 -->
-      <text class="text-functionCell-name">随机选择</text>
-    </view>
+    <!-- <view class="view-functionCell-box" bindtap="onClickRandomChoose" style="border-top: 1rpx solid #E4E4E4;"> -->
+    <!-- 随机选择的图标 -->
+    <!-- <image class="image-functionCell-icon" src="../../images/img_random_choose_icon.png"></image> -->
+    <!-- 随机选择的名称 -->
+    <!-- <text class="text-functionCell-name">随机选择</text> -->
+    <!-- </view> -->
     <!-- 随机笑话功能栏 -->
     <view class="view-functionCell-box" bindtap="onClickRandomJoke" style="border-top: 1rpx solid #E4E4E4;">
       <!-- 随机笑话的图标 -->
@@ -143,6 +143,34 @@
       </view>
       <!-- 设置昵称的上传按钮 -->
       <image class="image-set-upload" src="../../images/img_upload_icon.png" bindtap="onClickUploadNotice"></image>
+    </view>
+  </block>
+  <!-- 是否显示其他功能页面 -->
+  <block wx:if="{{isShowOtherFunctionView}}">
+    <!-- 显示其他功能页的蒙版 -->
+    <view class="view-popupMask-box" bindtap="onClickOtherFunctionMask"></view>
+    <!-- 显示其他功能框 -->
+    <view class="view-otherFunction-box">
+      <!-- 显示其他功能页的名称 -->
+      <text class="text-otherFunction-viewName">{{otherFunctionTitle}}</text>
+      <!-- 显示其他功能页的内容 -->
+      <text class="text-otherFunction-content" user-select>{{otherFunctionContent}}</text>
+    </view>
+  </block>
+  <!-- 是否显示关于小程序页面 -->
+  <block wx:if="{{isShowAboutApp}}">
+    <!-- 显示关于小程序页的蒙版 -->
+    <view class="view-popupMask-box" bindtap="onClickAboutAppMask"></view>
+    <!-- 显示关于小程序页内容框 -->
+    <view class="view-aboutApp-box">
+      <!-- 显示关于小程序页的名称 -->
+      <view class="view-functionBox-name">关于小程序</view>
+      <!-- 显示关于小程序页的内容 -->
+      <text class="text-aboutApp-content" user-select>{{aboutAppContent}}</text>
+      <!-- 显示关于小程序页的点赞按钮 -->
+      <image class="image-praise-icon" src="{{isPraiseApp ? '../../images/img_praise_icon.png' : '../../images/img_no_praise_icon.png'}}" bindtap="onClickPraiseApp"></image>
+      <!-- 显示关于小程序页的点赞人数 -->
+      <text class="text-praise-num">{{praiseAppSum}}</text>
     </view>
   </block>
 </view>

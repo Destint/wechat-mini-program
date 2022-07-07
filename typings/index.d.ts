@@ -20,6 +20,10 @@ interface IAppOption {
     calendarCacheName: string;
     /** 是否有管理权限缓存名 */
     hasManagePermissionCacheName: string;
+    /** 是否赞美小程序缓存名 */
+    isPraiseAppCacheName: string;
+    /** 赞美小程序人数缓存名 */
+    praiseAppSumCacheName: string;
   };
   /** 检测小程序版本 有新版本则自动更新 */
   checkAppVersion(): void;

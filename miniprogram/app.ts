@@ -12,7 +12,9 @@ App<IAppOption>({
     memorySumCacheName: 'memorySum',
     nicknameCacheName: 'nickname',
     calendarCacheName: 'calendar',
-    hasManagePermissionCacheName: 'hasManagePermission'
+    hasManagePermissionCacheName: 'hasManagePermission',
+    isPraiseAppCacheName: 'isPraiseApp',
+    praiseAppSumCacheName: 'praiseAppSum'
   },
 
   onLaunch() {
