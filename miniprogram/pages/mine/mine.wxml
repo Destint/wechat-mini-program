@@ -5,7 +5,7 @@
   <!-- 顶部信息栏 -->
   <view class="view-top-box">
     <!-- 用户头像栏 -->
-    <image class="image-userInfo-avatar" src="{{localAvatarPath ? localAvatarPath : '../../images/img_default_avatar_icon.png'}}"></image>
+    <image class="image-userInfo-avatar" src="{{localAvatarPath ? localAvatarPath : '../../images/img_default_avatar_icon.png'}}" mode="aspectFill"></image>
     <!-- 用户昵称栏 -->
     <text class="text-userInfo-nickName">{{nickname}}</text>
     <!-- 是否有万年历数据 -->
