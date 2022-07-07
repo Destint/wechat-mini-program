@@ -25,25 +25,6 @@
       </view>
     </block>
   </view>
-  <!-- 反馈信息的功能栏 -->
-  <view class="view-function-box">
-    <!-- 意见反馈功能栏 -->
-    <view class="view-functionCell-box" bindtap="onClickFeedback">
-      <!-- 意见反馈的图标 -->
-      <image class="image-functionCell-icon" src="../../images/img_feedback_icon.png"></image>
-      <!-- 意见反馈的名称 -->
-      <text class="text-functionCell-name">意见反馈</text>
-    </view>
-    <!-- 联系客服功能栏 -->
-    <view class="view-functionCell-box" style="border-top: 1rpx solid #E4E4E4;">
-      <!-- 联系客服的图标 -->
-      <image class="image-functionCell-icon" src="../../images/img_contact_icon.png"></image>
-      <!-- 联系客服的名称 -->
-      <text class="text-functionCell-name">联系客服</text>
-      <!-- 联系客服的功能按钮 -->
-      <button class="button-functionCell-general" open-type="contact"></button>
-    </view>
-  </view>
   <!-- 设置信息的功能栏 -->
   <view class="view-function-box">
     <!-- 设置头像功能栏 -->
@@ -104,8 +85,17 @@
   </view>
   <!-- 关于小程序的功能栏 -->
   <view class="view-function-box">
-    <!-- 分享小程序功能栏 -->
+    <!-- 联系客服功能栏 -->
     <view class="view-functionCell-box">
+      <!-- 联系客服的图标 -->
+      <image class="image-functionCell-icon" src="../../images/img_contact_icon.png"></image>
+      <!-- 联系客服的名称 -->
+      <text class="text-functionCell-name">联系客服</text>
+      <!-- 联系客服的功能按钮 -->
+      <button class="button-functionCell-general" open-type="contact"></button>
+    </view>
+    <!-- 分享小程序功能栏 -->
+    <view class="view-functionCell-box" style="border-top: 1rpx solid #E4E4E4;">
       <!-- 分享小程序的图标 -->
       <image class="image-functionCell-icon" src="../../images/img_share_app_icon.png"></image>
       <!-- 分享小程序的名称 -->

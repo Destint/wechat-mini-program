@@ -51,7 +51,7 @@ App<IAppOption>({
     try {
       wx.cloud.callFunction({
         name: 'uploadAccess'
-      })
+      }).then(() => { }).catch(() => { })
     } catch (err) {
       that.showToast('网络异常请重试');
     }

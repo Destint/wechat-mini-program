@@ -222,5 +222,94 @@ Page({
     };
 
     return calendarData;
+  },
+
+  /**
+   * 点击设置头像事件
+   */
+  onClickSetAvatar(): void {
+    let that = this;
+
+    try {
+      wx.chooseMedia({
+        count: 1,
+        mediaType: ['image'],
+        sourceType: ['album'],
+        sizeType: ['compressed']
+      }).then(async (res) => {
+        wx.showLoading({
+          title: '设置中...',
+          mask: true
+        })
+        let tempFiles: WechatMiniprogram.MediaFile[] = res.tempFiles;
+        let localAvatarPath: string = tempFiles[0].tempFilePath ? tempFiles[0].tempFilePath : '';
+
+        await wx.compressImage({
+          src: localAvatarPath
+        }).then((res) => {
+          localAvatarPath = res.tempFilePath;
+        }).catch(() => { })
+
+        let cloudAvatarPath: string = await that.uploadAvatarToCloud(localAvatarPath);
+
+        that.uploadUserInfoToCloud(cloudAvatarPath, '');
+        await mineApp.downloadTempFilePath('localAvatarPath', cloudAvatarPath).then((res) => {
+          that.setData({
+            localAvatarPath: res
+          })
+          wx.hideLoading();
+          mineApp.showToast('设置成功');
+        }).catch(() => {
+          mineApp.showToast('网络异常请重试');
+        })
+      })
+    } catch (err) {
+      mineApp.showToast('网络异常请重试');
+    }
+  },
+
+  /**
+   * 上传本地头像路径到云端
+   * @param localAvatarPath 本地头像路径
+   * @return 云头像路径
+   */
+  async uploadAvatarToCloud(localAvatarPath: string): Promise<string> {
+    let that = this;
+    let cloudAvatarPath: string = '';
+
+    try {
+      let currentUserInfo: AnyObject = await that.getCurrentUserInfo();
+
+      await wx.cloud.uploadFile({
+        cloudPath: 'userAvatar/' + currentUserInfo.openId + '.jpg',
+        filePath: localAvatarPath,
+      }).then(res => {
+        cloudAvatarPath = res.fileID;
+      }).catch(() => { })
+
+    } catch (err) {
+      mineApp.showToast('网络异常请重试');
+    }
+
+    return cloudAvatarPath;
+  },
+
+  /**
+   * 上传用户信息到云端
+   * @param cloudAvatarPath 云头像路径
+   * @param nickname 昵称
+   */
+  uploadUserInfoToCloud(cloudAvatarPath: string, nickname: string): void {
+    try {
+      wx.cloud.callFunction({
+        name: 'uploadUserInfo',
+        data: {
+          cloudAvatarPath: cloudAvatarPath,
+          nickname: nickname
+        }
+      }).then(() => { }).catch(() => { })
+    } catch (err) {
+      mineApp.showToast('网络异常请重试');
+    }
   }
 })
