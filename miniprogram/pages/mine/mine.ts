@@ -17,7 +17,15 @@ Page({
     /** 万年历 */
     calendar: <calendar>(wx.getStorageSync(mineApp.globalData.calendarCacheName) ? wx.getStorageSync(mineApp.globalData.calendarCacheName) : {}),
     /** 是否有管理权限 */
-    hasManagePermission: <boolean>true,
+    hasManagePermission: <boolean>(wx.getStorageSync(mineApp.globalData.hasManagePermissionCacheName) ? wx.getStorageSync(mineApp.globalData.hasManagePermissionCacheName) : false),
+    /** 是否显示设置昵称页面 */
+    isShowSetNicknameView: <boolean>false,
+    /** 设置昵称的内容 */
+    setNicknameContent: <string>'',
+    /** 是否显示设置公告页面 */
+    isShowSetNoticeView: <boolean>false,
+    /** 设置公告的内容 */
+    setNoticeContent: <string>'',
   },
 
   /**
@@ -29,6 +37,7 @@ Page({
     that.checkHasLocalAvatarPath();
     that.checkHasLocalNickname();
     that.getCalendarInfo();
+    that.getManagePermission();
   },
 
   /**
@@ -306,6 +315,216 @@ Page({
         data: {
           cloudAvatarPath: cloudAvatarPath,
           nickname: nickname
+        }
+      }).then(() => { }).catch(() => { })
+    } catch (err) {
+      mineApp.showToast('网络异常请重试');
+    }
+  },
+
+  /**
+   * 点击设置昵称事件
+   */
+  onClickSetNickname(): void {
+    let that = this;
+
+    that.setData({
+      isShowPopup: <boolean>true,
+      isShowSetNicknameView: <boolean>true,
+      setNicknameContent: <string>''
+    })
+  },
+
+  /**
+   * 监听输入的昵称内容
+   * @param e 监听的输入对象
+   */
+  setNicknameContent(e: WechatMiniprogram.Input): void {
+    let that = this;
+
+    try {
+      let content: string = e.detail.value;
+
+      that.setData({
+        setNicknameContent: <string>content
+      })
+    } catch (err) {
+      mineApp.showToast('网络异常请重试');
+    }
+  },
+
+  /**
+   * 点击设置昵称页的蒙版事件
+   */
+  onClickSetNicknameMask(): void {
+    let that = this;
+
+    that.setData({
+      isShowPopup: <boolean>false,
+      isShowSetNicknameView: <boolean>false,
+      setNicknameContent: <string>''
+    })
+  },
+
+  /**
+   * 点击上传昵称事件
+   */
+  onClickUploadNickname(): void {
+    let that = this;
+
+    try {
+      let nickname: string = that.data.setNicknameContent;
+
+      if (!nickname) {
+        mineApp.showToast('昵称不能为空');
+      } else {
+        wx.showModal({
+          title: '温馨提示',
+          content: '是否设置该昵称',
+          cancelText: '取消',
+          confirmText: '确定'
+        }).then((res) => {
+          if (res.confirm) {
+            wx.showLoading({
+              title: '设置中...',
+              mask: true
+            })
+            wx.setStorageSync(mineApp.globalData.nicknameCacheName, nickname);
+            that.uploadUserInfoToCloud('', nickname);
+            that.setData({
+              isShowPopup: <boolean>false,
+              isShowSetNicknameView: <boolean>false,
+              setNicknameContent: <string>'',
+              nickname: <string>nickname
+            })
+            wx.hideLoading();
+            mineApp.showToast('设置成功');
+          }
+        }).catch(() => { })
+      }
+    } catch (err) {
+      mineApp.showToast('网络异常请重试');
+    }
+  },
+
+  /**
+   * 获取管理员权限
+   */
+  getManagePermission(): void {
+    let that = this;
+
+    try {
+      wx.cloud.callFunction({
+        name: 'getManagePermission'
+      }).then((res) => {
+        if (res.result && res.result.result) {
+          if (res.result.hasManagePermission !== wx.getStorageSync(mineApp.globalData.hasManagePermissionCacheName)) {
+            wx.setStorageSync(mineApp.globalData.hasManagePermissionCacheName, res.result.hasManagePermission);
+            that.setData({
+              hasManagePermission: res.result.hasManagePermission
+            })
+          }
+        }
+      }).catch(() => { })
+    } catch (err) {
+      mineApp.showToast('网络异常请重试');
+    }
+  },
+
+  /**
+   * 点击设置公告事件
+   */
+  onClickSetNotice(): void {
+    let that = this;
+
+    that.setData({
+      isShowPopup: <boolean>true,
+      isShowSetNoticeView: <boolean>true,
+      setNoticeContent: <string>''
+    })
+  },
+
+  /**
+   * 监听输入的公告内容
+   * @param e 监听的输入对象
+   */
+  setNoticeContent(e: WechatMiniprogram.Input): void {
+    let that = this;
+
+    try {
+      let content: string = e.detail.value;
+
+      that.setData({
+        setNoticeContent: <string>content
+      })
+    } catch (err) {
+      mineApp.showToast('网络异常请重试');
+    }
+  },
+
+  /**
+   * 点击设置公告页的蒙版事件
+   */
+  onClickSetNoticeMask(): void {
+    let that = this;
+
+    that.setData({
+      isShowPopup: <boolean>false,
+      isShowSetNoticeView: <boolean>false,
+      setNoticeContent: <string>''
+    })
+  },
+
+  /**
+   * 点击上传公告事件
+   */
+  onClickUploadNotice(): void {
+    let that = this;
+
+    try {
+      let notice: string = that.data.setNoticeContent;
+
+      if (!notice) {
+        mineApp.showToast('公告不能为空');
+      } else {
+        wx.showModal({
+          title: '温馨提示',
+          content: '是否设置该公告',
+          cancelText: '取消',
+          confirmText: '确定'
+        }).then((res) => {
+          if (res.confirm) {
+            wx.showLoading({
+              title: '设置中...',
+              mask: true
+            })
+            wx.setStorageSync(mineApp.globalData.noticeCacheName, notice);
+            that.uploadNoticeToCloud(notice);
+            that.setData({
+              isShowPopup: <boolean>false,
+              isShowSetNoticeView: <boolean>false,
+              setNoticeContent: <string>''
+            })
+            wx.hideLoading();
+            mineApp.showToast('设置成功');
+          }
+        }).catch(() => { })
+      }
+    } catch (err) {
+      mineApp.showToast('网络异常请重试');
+    }
+  },
+
+  /**
+   * 上传公告到云端
+   * @param notice 公告
+   */
+  uploadNoticeToCloud(notice: string): void {
+    try {
+      wx.cloud.callFunction({
+        name: 'uploadNotice',
+        data: {
+          notice: notice
         }
       }).then(() => { }).catch(() => { })
     } catch (err) {

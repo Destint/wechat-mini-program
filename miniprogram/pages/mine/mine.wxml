@@ -111,4 +111,38 @@
       <text class="text-functionCell-name">关于小程序</text>
     </view>
   </view>
+  <!-- 是否显示设置昵称页面 -->
+  <block wx:if="{{isShowSetNicknameView}}">
+    <!-- 设置昵称弹窗的蒙版 -->
+    <view class="view-popupMask-box" bindtap="onClickSetNicknameMask"></view>
+    <!-- 设置昵称的弹出框 -->
+    <view class="view-set-box">
+      <!-- 设置昵称的弹出框名称 -->
+      <view class="view-functionBox-name">设置昵称</view>
+      <!-- 设置昵称的输入框 -->
+      <view class="view-input-box">
+        <!-- 设置昵称的输入栏 -->
+        <input class="input-set-content" maxlength="6" placeholder="请输入昵称..." placeholder-style="color: rgba(70,123,115,0.5);" bindinput="setNicknameContent" />
+      </view>
+      <!-- 设置昵称的上传按钮 -->
+      <image class="image-set-upload" src="../../images/img_upload_icon.png" bindtap="onClickUploadNickname"></image>
+    </view>
+  </block>
+  <!-- 是否显示设置公告页面 -->
+  <block wx:if="{{isShowSetNoticeView}}">
+    <!-- 设置公告弹窗的蒙版 -->
+    <view class="view-popupMask-box" bindtap="onClickSetNoticeMask"></view>
+    <!-- 设置公告的弹出框 -->
+    <view class="view-set-box">
+      <!-- 设置公告的弹出框名称 -->
+      <view class="view-functionBox-name">设置公告</view>
+      <!-- 设置公告的输入框 -->
+      <view class="view-input-box">
+        <!-- 设置公告的输入栏 -->
+        <input class="input-set-content" maxlength="40" placeholder="公告内容..." placeholder-style="color: rgba(70,123,115,0.5);" bindinput="setNoticeContent" />
+      </view>
+      <!-- 设置昵称的上传按钮 -->
+      <image class="image-set-upload" src="../../images/img_upload_icon.png" bindtap="onClickUploadNotice"></image>
+    </view>
+  </block>
 </view>

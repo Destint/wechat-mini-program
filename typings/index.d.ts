@@ -18,6 +18,8 @@ interface IAppOption {
     nicknameCacheName: string;
     /** 万年历缓存名 */
     calendarCacheName: string;
+    /** 是否有管理权限缓存名 */
+    hasManagePermissionCacheName: string;
   };
   /** 检测小程序版本 有新版本则自动更新 */
   checkAppVersion(): void;

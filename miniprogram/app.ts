@@ -11,7 +11,8 @@ App<IAppOption>({
     memoryListCacheName: 'memoryList',
     memorySumCacheName: 'memorySum',
     nicknameCacheName: 'nickname',
-    calendarCacheName: 'calendar'
+    calendarCacheName: 'calendar',
+    hasManagePermissionCacheName: 'hasManagePermission'
   },
 
   onLaunch() {
