@@ -13,7 +13,7 @@
     </view>
     <!-- 回忆总数栏 -->
     <view class="view-centerY-box" style="margin-top: 30rpx;margin-bottom: 100rpx;">
-      <view class="text-whiteThirty-content">全部回忆 ({{memorySum}})</view>
+      <view class="text-whiteThirty-content">全部回忆({{memorySum}})</view>
     </view>
   </view>
   <!-- 有回忆存在时 -->
